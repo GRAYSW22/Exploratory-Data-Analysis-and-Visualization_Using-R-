@@ -1,0 +1,136 @@
+---
+title: "SGRAYDSC520WEEK5"
+author: "STEPHEN GRAY"
+date: "2023-10-02"
+output: pdf_document
+header-includes:
+  - "\\usepackage{scale}"
+  - "\\usepackage{rotating}"
+---
+
+# Data Analysis and Transformation
+
+## Dataset Preview
+
+1. **Resize the Font**: Use the LaTeX package `scale` to reduce the font size of the table.
+
+### Rotated Table for Better Fit
+
+```{r, echo=FALSE, results='asis'}
+cat("\\begin{sidewaystable}\n")
+library(knitr)
+kable(head(data), caption = "Preview of the Dataset", booktabs = TRUE)
+cat("\\end{sidewaystable}\n")
+```
+
+```{r setup, include=FALSE}
+library(knitr)
+library(readr)
+```
+
+```{r}
+# Now you can use read_csv
+data <- read_csv("C:/Users/grays/Downloads/Data WEEK 5 (1).csv")
+
+# Rename columns to ensure they do not contain special characters 
+# that might interfere with LaTeX rendering
+names(data) <- make.names(names(data))
+
+# Display the first few rows of the dataset using kable
+kable(head(data), caption = "Preview of the Dataset")
+```
+
+
+```{r}
+# Load additional required libraries
+library(dplyr)
+library(purrr)
+library(ggplot2)
+
+# dplyr operations
+# 1. GroupBy
+grouped_data <- data %>% group_by(state)
+# Display the first few rows of grouped_data
+head(grouped_data)
+
+# 2. Summarize
+summarized_data <- grouped_data %>% summarize(total_population = sum(population, na.rm = TRUE))
+# Display the first few rows of summarized_data
+head(summarized_data)
+
+# 3. Mutate
+# Assuming a 'land_area' column exists in the 'data' data.frame
+mutated_data <- data %>% mutate(population_density = population / land_area)
+# Display the first few rows of mutated_data
+head(mutated_data)
+
+# 4. Filter
+# Assuming a 'region' column exists in the 'data' data.frame
+filtered_data <- data %>% filter(region == "South")
+# Display the first few rows of filtered_data
+head(filtered_data)
+
+# 5. Select
+# Assuming a 'county' column exists in the 'data' data.frame
+selected_data <- data %>% select(state, county, population)
+# Display the first few rows of selected_data
+head(selected_data)
+
+# 6. Arrange
+arranged_data <- data %>% arrange(desc(population))
+# Display the first few rows of arranged_data
+head(arranged_data)
+
+# purrr functions
+# 1. keep
+kept_data <- keep(data, ~ any(. == "Alabama", na.rm = TRUE)) # Handle NA values
+# Display the first few rows of kept_data
+head(kept_data)
+
+# 2. discard
+discarded_data <- discard(data, ~ any(. == "Alabama", na.rm = TRUE)) # Handle NA values
+# Display the first few rows of discarded_data
+head(discarded_data)
+```
+
+
+```{r}
+# cbind and rbind functions
+# Create two data frames
+data1 <- data.frame(
+  state = c("California", "Texas", "Florida"),
+  population = c(39538223, 29145505, 21538187)
+)
+
+data2 <- data.frame(
+  state = c("New York", "Pennsylvania", "Illinois"),
+  population = c(20201249, 13002700, 12812508)
+)
+
+# cbind operation
+cbound_data <- cbind(data1, data2)
+kable(cbound_data, caption = "Combined Data using cbind")
+
+# rbind operation
+rbind_data <- rbind(data1, data2)
+kable(rbind_data, caption = "Combined Data using rbind")
+
+# Visualization for cbind
+# Plotting population of states from data1 and data2 side by side
+cbind_plot <- ggplot() +
+  geom_bar(data = data1, aes(x = state, y = population), stat = "identity", fill = "blue", alpha = 0.5) +
+  geom_bar(data = data2, aes(x = state, y = population), stat = "identity", fill = "red", alpha = 0.5) +
+  labs(title = "Population by State (cbind)", x = "State", y = "Population") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+print(cbind_plot)
+
+# Visualization for rbind
+# Combining data1 and data2 into a single data frame, and then plotting
+combined_data <- rbind(data1, data2)
+rbind_plot <- ggplot(combined_data, aes(x = state, y = population, fill = state)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Population by State (rbind)", x = "State", y = "Population") +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1))
+print(rbind_plot)
+```
+
